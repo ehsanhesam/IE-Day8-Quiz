@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Day 8: Zara Supply Chain Quiz</title>
+<style>
+  :root { --bg:#0f172a; --card:#ffffff; --ink:#0f172a; --muted:#64748b; --accent:#2563eb; --good:#15803d; --bad:#b91c1c; --soft:#dbeafe; }
+  * { box-sizing:border-box; -webkit-tap-highlight-color: transparent; }
+  body { margin:0; font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; background:linear-gradient(135deg,#0f172a,#1e3a8a); color:var(--ink); min-height:100vh; padding:18px; }
+  .wrap { max-width:780px; margin:0 auto; }
+  .card { background:var(--card); border-radius:24px; padding:24px; box-shadow:0 20px 60px rgba(0,0,0,.28); margin-top:18px; }
+  h1 { font-size:2rem; margin:0 0 10px; color:#fff; text-align:center; }
+  .subtitle { color:#dbeafe; text-align:center; margin-bottom:14px; }
+  h2 { font-size:1.28rem; line-height:1.3; margin:8px 0 18px; }
+  button { font:inherit; touch-action:manipulation; cursor:pointer; }
+  .start, .next, .restart { border:none; border-radius:999px; background:var(--accent); color:white; padding:14px 20px; width:100%; font-weight:700; margin-top:15px; }
+  .option { width:100%; text-align:left; border:2px solid #e2e8f0; border-radius:18px; background:#f8fafc; padding:14px; margin:8px 0; line-height:1.35; }
+  .option span { display:inline-flex; align-items:center; justify-content:center; width:30px; height:30px; border-radius:50%; background:var(--soft); color:var(--accent); font-weight:800; margin-right:8px; }
+  .option.correct { border-color:var(--good); background:#ecfdf5; }
+  .option.wrong { border-color:var(--bad); background:#fef2f2; }
+  .progress { color:var(--muted); font-weight:700; font-size:.95rem; }
+  .feedback { margin-top:14px; padding:12px; border-radius:16px; display:none; line-height:1.4; }
+  .feedback.good { display:block; background:#dcfce7; color:#14532d; }
+  .feedback.bad { display:block; background:#fee2e2; color:#7f1d1d; }
+  .score { font-size:3rem; text-align:center; font-weight:900; color:var(--accent); }
+  .badge { display:inline-block; background:#dbeafe; color:#1e40af; padding:6px 12px; border-radius:999px; font-weight:700; }
+  .tip { color:var(--muted); font-size:.95rem; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Day 8: Zara Supply Chain Quiz</h1>
+  <div class="subtitle">Industrial Engineering mini-game quiz</div>
+  <section class="card" id="intro">
+    <span class="badge">Fun challenge</span>
+    <h2>Can you think like a supply chain designer?</h2>
+    <p>Choose the best answer. The quiz will only tell you whether you are correct or incorrect.</p>
+    <p class="tip">For best results, open from a GitHub Pages link in Safari/Chrome, not as a file preview.</p>
+    <button type="button" class="start" id="startBtn">Start the quiz</button>
+  </section>
+  <section class="card question" id="questionCard" style="display:none">
+    <div class="progress" id="progressText"></div>
+    <h2 id="questionText"></h2>
+    <div class="options" id="optionsBox"></div>
+    <div class="feedback" id="feedback" aria-live="polite"></div>
+    <button type="button" class="next" id="nextBtn" style="display:none">Next</button>
+  </section>
+  <section class="card" id="result" style="display:none">
+    <span class="badge">Finished</span>
+    <h2>Your score</h2>
+    <div class="score" id="scoreBox">0/12</div>
+    <p id="resultText"></p>
+    <button type="button" class="restart" id="restartBtn">Try again</button>
+  </section>
+</div>
+<script>
+(function() {
+  var quiz = [{"q": "What is the main reason Zara is a good IE case?", "opts": {"A": "It only sells expensive products", "B": "It connects design, production, logistics, stores, and information", "C": "It avoids all supply chain decisions", "D": "It uses no factories"}, "ans": "B"}, {"q": "Compared with many competitors, Zara\u2019s design-to-shelf time is...", "opts": {"A": "Much shorter", "B": "Exactly the same", "C": "Always one year", "D": "Unknown and random"}, "ans": "A"}, {"q": "Which strategy best describes Zara\u2019s fashion-product approach?", "opts": {"A": "Produce huge quantities before knowing demand", "B": "Ignore customer reactions", "C": "Test, learn, and reproduce quickly", "D": "Sell only one design per year"}, "ans": "C"}, {"q": "Why does Zara produce many items near Spain even when it is expensive?", "opts": {"A": "To increase advertising cost", "B": "Because distance never matters", "C": "To avoid all suppliers", "D": "To respond faster to market demand"}, "ans": "D"}, {"q": "In Zara\u2019s distribution center, products are mainly...", "opts": {"A": "Sorted and shipped quickly", "B": "Stored for many months", "C": "Destroyed after arrival", "D": "Priced by customers"}, "ans": "A"}, {"q": "For uncertain fashion products, Zara usually prefers...", "opts": {"A": "Only long-term forecasting", "B": "Small batches and rapid learning", "C": "No information from stores", "D": "No production during the season"}, "ans": "B"}, {"q": "What does vertical integration mean in this case?", "opts": {"A": "Only selling online", "B": "Only outsourcing to far countries", "C": "Controlling many stages such as design, procurement, production, distribution, and retail", "D": "Using only one supplier"}, "ans": "C"}, {"q": "What is the role of store information in Zara\u2019s design process?", "opts": {"A": "It is ignored", "B": "It replaces all managers", "C": "It is used only for accounting", "D": "It helps designers and product managers understand customer preferences"}, "ans": "D"}, {"q": "Which sentence best explains \u201cspeed over efficiency\u201d?", "opts": {"A": "Sometimes extra capacity or nearby production is accepted to react faster", "B": "The cheapest plan is always best", "C": "All trucks must wait until fully loaded", "D": "Factories should always run at 100% capacity"}, "ans": "A"}, {"q": "What is one reason Zara can reduce forecasting risk?", "opts": {"A": "It never changes products", "B": "It learns from trial sales and market reactions", "C": "It sells only basic products", "D": "It has no uncertainty"}, "ans": "B"}, {"q": "What is the \u201cToyota effect\u201d idea in Zara\u2019s supply chain?", "opts": {"A": "No production planning", "B": "Only luxury products", "C": "Flexible small-batch production", "D": "No suppliers"}, "ans": "C"}, {"q": "What is the big lesson of Day 8?", "opts": {"A": "Supply chains should always minimize only cost", "B": "Fashion has no operations problems", "C": "Warehouses are always only for storage", "D": "Supply chain design should match competitive strategy"}, "ans": "D"}];
+  var total = quiz.length;
+  var current = 0;
+  var score = 0;
+  var answered = false;
+  function show(id) { document.getElementById(id).style.display = 'block'; }
+  function hide(id) { document.getElementById(id).style.display = 'none'; }
+  function renderQuestion() {
+    answered = false;
+    var item = quiz[current];
+    document.getElementById('progressText').innerHTML = 'Question ' + (current + 1) + ' of ' + total;
+    document.getElementById('questionText').innerHTML = item.q;
+    var box = document.getElementById('optionsBox');
+    box.innerHTML = '';
+    ['A','B','C','D'].forEach(function(letter) {
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'option';
+      b.setAttribute('data-letter', letter);
+      b.innerHTML = '<span>' + letter + '</span> ' + item.opts[letter];
+      b.addEventListener('click', function() { choose(b); }, false);
+      box.appendChild(b);
+    });
+    var fb = document.getElementById('feedback');
+    fb.className = 'feedback';
+    fb.innerHTML = '';
+    hide('nextBtn');
+  }
+  function startQuiz() { hide('intro'); current = 0; score = 0; renderQuestion(); show('questionCard'); }
+  function choose(btn) {
+    if (answered) return;
+    answered = true;
+    var letter = btn.getAttribute('data-letter');
+    var correct = quiz[current].ans;
+    var fb = document.getElementById('feedback');
+    if (letter === correct) {
+      score++;
+      btn.className += ' correct';
+      fb.className = 'feedback good';
+      fb.innerHTML = 'Correct!';
+    } else {
+      btn.className += ' wrong';
+      fb.className = 'feedback bad';
+      fb.innerHTML = 'Incorrect.';
+    }
+    show('nextBtn');
+  }
+  function nextQuestion() {
+    current++;
+    if (current < total) renderQuestion();
+    else finish();
+  }
+  function finish() {
+    hide('questionCard');
+    document.getElementById('scoreBox').innerHTML = score + '/' + total;
+    var msg = 'Good effort! Review the lecture ideas and try again if you want.';
+    if (score >= total-2) msg = 'Excellent! You understood the supply chain logic very well.';
+    else if (score >= Math.ceil(total/2)) msg = 'Nice work! You understood many of the key ideas.';
+    document.getElementById('resultText').innerHTML = msg;
+    show('result');
+  }
+  function restart() { window.location.reload(); }
+  document.getElementById('startBtn').addEventListener('click', startQuiz, false);
+  document.getElementById('nextBtn').addEventListener('click', nextQuestion, false);
+  document.getElementById('restartBtn').addEventListener('click', restart, false);
+})();
+</script>
+</body>
+</html>
